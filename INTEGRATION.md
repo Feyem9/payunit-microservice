@@ -256,7 +256,7 @@ Utile pour vérifier le statut d'une transaction sans attendre le webhook.
 ## 8. Test rapide avec curl
 
 ```bash
-# Remplacez VOTRE_CLE et VOTRE_URL
+# Remplacez VOTRE_CLE
 curl -X POST https://payunit-microservice.onrender.com/api/payment/initiate \
   -H "Content-Type: application/json" \
   -H "x-api-key: VOTRE_CLE" \
