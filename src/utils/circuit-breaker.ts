@@ -3,9 +3,9 @@ import logger from './logger';
 
 const options = {
   timeout: 15000,
-  errorThresholdPercentage: 60, // Ouvre le circuit si 60% des appels échouent
-  resetTimeout: 10000,          // Réessaie après 10s (réduit de 30s)
-  volumeThreshold: 10,          // Minimum 10 appels avant d'évaluer
+  errorThresholdPercentage: 100, // Désactivé en pratique — n'ouvre que si 100% échouent
+  resetTimeout: 5000,
+  volumeThreshold: 50,           // Nécessite 50 appels avant d'évaluer
 };
 
 // Crée un circuit breaker autour d'une fonction async
