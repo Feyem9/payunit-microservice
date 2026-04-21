@@ -117,6 +117,7 @@ export class PayUnitService {
       cancel_url: dto.cancelUrl || env.PAYUNIT_CANCEL_URL,
       purchaser_name: dto.clientName,
       purchaser_email: dto.clientEmail,
+      mode: env.PAYUNIT_MODE === 'live' || env.PAYUNIT_MODE === 'LIVE' ? 'PRODUCTION' : 'SANDBOX',
       metadata,
     };
 
