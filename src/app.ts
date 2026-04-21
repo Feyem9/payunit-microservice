@@ -76,7 +76,9 @@ export function createApp(service?: PayUnitService) {
     let payunitStatus = 'unreachable';
 
     try {
-      await payunitClient.get(`${BASE_URL}/health`, {
+      // Client direct sans circuit breaker pour le health check
+      const { default: axios } = await import('axios');
+      await axios.get(`${BASE_URL}/health`, {
         headers: { 'x-api-key': env.PAYUNIT_API_KEY },
         timeout: 3000,
       });
