@@ -29,6 +29,9 @@ const BASE_URL = env.PAYUNIT_BASE_URL ||
 export function createApp(service?: PayUnitService) {
   const app = express();
 
+  // Faire confiance au proxy Render/Cloudflare pour le rate limiting et les IPs
+  app.set('trust proxy', 1);
+
   const allowedOrigins = env.ALLOWED_ORIGINS
     .split(',')
     .map((o) => o.trim())
@@ -70,7 +73,7 @@ export function createApp(service?: PayUnitService) {
 
   app.get('/health', async (_req, res) => {
     const start = Date.now();
-    let payunitStatus = 'unknown';
+    let payunitStatus = 'unreachable';
 
     try {
       await payunitClient.get(`${BASE_URL}/health`, {
@@ -79,7 +82,7 @@ export function createApp(service?: PayUnitService) {
       });
       payunitStatus = 'reachable';
     } catch {
-      payunitStatus = 'unreachable';
+      // reste 'unreachable'
     }
 
     const latency = Date.now() - start;
