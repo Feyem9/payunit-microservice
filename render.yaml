@@ -3,7 +3,7 @@ services:
     name: payunit-microservice
     runtime: node
     plan: free
-    buildCommand: npm install && npm run build
+    buildCommand: npm ci && npm run build
     startCommand: node dist/index.js
     healthCheckPath: /health
     envVars:
