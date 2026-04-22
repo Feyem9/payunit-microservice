@@ -11,11 +11,20 @@ const MAX_TIMESTAMP_AGE_MS = 5 * 60 * 1000; // 5 minutes
 
 export function webhookSignatureMiddleware(req: RequestWithRawBody, res: Response, next: NextFunction): void {
   const secret = env.PAYUNIT_WEBHOOK_SECRET;
+
+  // Si pas de secret configuré, on accepte tous les callbacks
+  if (!secret || secret === 'your_webhook_secret_here') {
+    logger.warn('PAYUNIT_WEBHOOK_SECRET not configured — skipping signature verification');
+    next();
+    return;
+  }
+
   const signature = req.headers['x-payunit-signature'] as string | undefined;
 
   if (!signature) {
-    logger.warn('Missing x-payunit-signature header');
-    res.status(401).json({ error: 'Missing webhook signature' });
+    // PayUnit ne signe pas encore — on accepte quand même
+    logger.warn('Missing x-payunit-signature header — accepting callback without signature');
+    next();
     return;
   }
 

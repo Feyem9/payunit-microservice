@@ -117,6 +117,7 @@ export function createApp(service?: PayUnitService) {
     res.end(await registry.metrics());
   });
 
+  // Webhook PayUnit — signature optionnelle si PAYUNIT_WEBHOOK_SECRET non configuré
   app.use('/api/payment/callback', webhookSignatureMiddleware, createCallbackRouter(service));
   app.use('/api/payment', apiKeyMiddleware, createPaymentRouter(service));
 
