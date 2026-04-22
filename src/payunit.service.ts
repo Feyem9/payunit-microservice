@@ -20,8 +20,9 @@ import logger from './utils/logger';
 
 const isLive = env.PAYUNIT_MODE === 'live' || env.PAYUNIT_MODE === 'LIVE';
 
+// URL correcte basée sur l'implémentation qui fonctionne
 const BASE_URL = env.PAYUNIT_BASE_URL ||
-  (isLive ? 'https://app.payunit.net/api' : 'https://gateway.payunit.net/api');
+  (isLive ? 'https://app.payunit.net/api/gateway' : 'https://gateway.payunit.net/api/gateway');
 
 const initiateBreaker = createCircuitBreaker(
   (url: unknown, payload: unknown, config: unknown) =>
@@ -77,6 +78,7 @@ export class PayUnitService {
       'Authorization': `Basic ${credentials}`,
       'x-api-key': env.PAYUNIT_API_KEY,
       'Content-Type': 'application/json',
+      'mode': isLive ? 'live' : 'sandbox',
     };
   }
 
@@ -126,14 +128,16 @@ export class PayUnitService {
     const end = payunitLatencyHistogram.startTimer({ operation: 'initiate' });
     try {
       const response = (await initiateBreaker.fire(
-        `${BASE_URL}/gateway/initialize`,
+        `${BASE_URL}/initialize`,
         payload,
         { headers: this.getAuthHeader() }
       )) as { data: Record<string, unknown> };
       end();
 
       const paymentUrl =
+        (response.data['data'] as Record<string, string> | undefined)?.['transaction_url'] ||
         (response.data['data'] as Record<string, string> | undefined)?.['payment_url'] ||
+        (response.data['transaction_url'] as string | undefined) ||
         (response.data['payment_url'] as string | undefined) || '';
 
       const result: PaymentResult = { transactionId, paymentUrl, status: 'initiated' };
@@ -196,7 +200,7 @@ export class PayUnitService {
     const end = payunitLatencyHistogram.startTimer({ operation: 'verify' });
     try {
       const response = (await verifyBreaker.fire(
-        `${BASE_URL}/gateway/transaction/${transactionId}`,
+        `${BASE_URL}/paymentstatus/${transactionId}`,
         { headers: this.getAuthHeader() }
       )) as { data: Record<string, unknown> };
       end();
