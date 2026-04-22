@@ -5,7 +5,7 @@ import * as https from 'https';
 
 // Client pour les appels vers l'API PayUnit — force HTTP/1.1 (PayUnit ne supporte pas HTTP/2)
 export const payunitClient = axios.create({
-  timeout: 15000,
+  timeout: 30000, // 30 secondes
   httpAgent: new http.Agent({ keepAlive: false }),
   httpsAgent: new https.Agent({ keepAlive: false }),
 });

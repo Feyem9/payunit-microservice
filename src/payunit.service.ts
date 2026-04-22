@@ -178,7 +178,8 @@ export class PayUnitService {
       end();
       paymentInitiatedCounter.inc({ status: 'error', currency });
       const { message, statusCode, upstream } = extractPayUnitError(error);
-      logger.error({ transactionId, statusCode, upstream }, `PayUnit initiate error: ${message}`);
+      // Log complet pour debug
+      logger.error({ transactionId, statusCode, upstream, rawError: error instanceof Error ? { message: error.message, code: (error as NodeJS.ErrnoException).code, stack: error.stack?.split('\n')[0] } : error }, `PayUnit initiate error: ${message}`);
 
       auditRepository.log({
         eventType: 'PAYMENT_INITIATION_FAILED',
