@@ -1,19 +1,23 @@
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
+import * as http from 'http';
+import * as https from 'https';
 
-// Client pour les appels vers l'API PayUnit
+// Client pour les appels vers l'API PayUnit — force HTTP/1.1 (PayUnit ne supporte pas HTTP/2)
 export const payunitClient = axios.create({
   timeout: 15000,
+  httpAgent: new http.Agent({ keepAlive: false }),
+  httpsAgent: new https.Agent({ keepAlive: false }),
 });
 
 // Retry automatique sur les erreurs réseau et 5xx — max 3 tentatives
 axiosRetry(payunitClient, {
   retries: 3,
-  retryDelay: axiosRetry.exponentialDelay, // 1s, 2s, 4s
+  retryDelay: axiosRetry.exponentialDelay,
   retryCondition: (error) => {
-    // Retry sur erreur réseau ou timeout
+    // Ne pas retry si le circuit est ouvert
+    if (error.message?.includes('circuit')) return false;
     if (axiosRetry.isNetworkError(error)) return true;
-    // Retry sur 503 (service indisponible) et 504 (gateway timeout)
     const status = error.response?.status;
     return status === 503 || status === 504;
   },
