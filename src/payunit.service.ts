@@ -63,6 +63,7 @@ export class PayUnitService {
       'Authorization': `Basic ${credentials}`,
       'x-api-key': env.PAYUNIT_API_KEY,
       'Content-Type': 'application/json',
+      'mode': isLive ? 'live' : 'sandbox',
     };
   }
 
@@ -102,7 +103,6 @@ export class PayUnitService {
       cancel_url: dto.cancelUrl || env.PAYUNIT_CANCEL_URL,
       purchaser_name: dto.clientName,
       purchaser_email: dto.clientEmail,
-      mode: isLive ? 'PRODUCTION' : 'SANDBOX',
       metadata,
     };
 
